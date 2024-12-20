@@ -6,11 +6,11 @@ from flask_session import Session
 
 app = Flask(__name__)
 con = sqlite3.connect("data.db", check_same_thread=False)
-
+secret_key = '1234'
 cursor = con.cursor()
 app.config['SESSION_TYPE']= 'cachelib'
 app.config['SESSION_CACHELIB'] = FileSystemCache(cache_dir='flask_session', threshold=500)
-
+Session(app)
 @app.route('/add/')
 def add():
     return render_template('add.html')
@@ -29,7 +29,7 @@ def save_post():
     return redirect(url_for('main_page'))
 
 
-@app.route('/all_post/')
+@app.route('/')
 def all_posts():
   cursor.execute('SELECT * FROM posts')
   data = cursor.fetchall()
@@ -41,7 +41,9 @@ def register():
 @app.route('/login/')
 def login_page():
     return render_template('login.html')
-
+@app.route('/main_page/')
+def main_page():
+    return render_template('main_page.html')
 @app.route('/save_register/', methods=['POST'])
 def save_register():
 
@@ -56,17 +58,19 @@ def save_register():
     con.commit()
     return redirect(url_for('login_page'))
 
+
+
 @app.route('/authorization/',methods=['POST'])
 def authorization():
-    secret_key = '1234'
+
     user_name = request.form['username']
     password = request.form['password']
     cursor.execute('SELECT user_name, password FROM save_register WHERE user_name=(?) and password=(?)', [user_name, password])
     data = cursor.fetchall()
-    if user_name ==user_name and password==password:
+    if user_name ==data and password==data:
 
         session['login'] = True
-        session['user_name'] = save_register.login
+        session['user_name'] = user_name
         session.permanent = False
         app.permanent_session_lifetime = timedelta(days=14)
         session.modified = True
