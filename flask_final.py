@@ -80,5 +80,3 @@ def authorization():
 
 
 
-
-app.run(debug=True)
